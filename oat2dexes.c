@@ -1,11 +1,23 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <stdbool.h>
 
 void write_to_file (unsigned char *data, int size, int file_count)
 {
 	char filename[16];
+	bool existent = true;
 	sprintf(filename, "dex%02d.dex", file_count);
+	while(existent) {
+		if(access(filename, F_OK) != 0) {
+			existent = false;
+			sprintf(filename, "dex%02d.dex", file_count);
+		} else {
+			file_count++;
+			sprintf(filename, "dex%02d.dex", file_count);
+		}
+	}
 	printf("Writing %d bytes to %s\n", size, filename);
 	FILE *fp = fopen(filename, "wb");
 	fwrite(data, 1, size, fp);
